@@ -7,10 +7,10 @@ Emotion-Aware Music Recommendation using NLP & Deep Learning
 ## Why I Built This
 
 I spend a lot of time listening to music while studying, coding, or just trying to unwind.
-At some point I noticed a pattern — the hardest part wasn’t playing music, it was deciding what to play.
+At some point I noticed a pattern, the hardest part wasn’t playing music, it was deciding what to play.
 Am I feeling happy? Tired? A bit anxious but hopeful?
 Those small “what should I listen to now?” moments kept breaking my flow.
-So I decided to build MoodMelody — a system that:
+So I decided to build MoodMelody, a system that:
 understands how I’m feeling from text
 predicts the underlying emotion
 and (in the extended version) recommends music that matches that mood
