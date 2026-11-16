@@ -156,21 +156,3 @@ Pretrained embeddings save time and improve stability
 Debugging data pipelines is just as important as model design
 Good ML systems are built step-by-step, not rushed end-to-end
 
-## Production Engineering Upgrades (v2)
-
-While keeping the core **Stacked BiLSTM (`128 -> 256 -> 128`) + 100d GloVe** architecture intact, the pipeline was upgraded to solve 5 real-world NLP & recommendation bottlenecks:
-
-1. **Contraction Expansion & Negation-Aware Stopword Removal:**
-   - Standard NLTK `stopwords.words('english')` strips polarity shifters like `not`, `never`, and `no` (turning *"I am not happy"* into `["happy"]`).
-   - Added regex contraction normalization (`didn't` / `didnt` → `did not`) prior to punctuation removal and whitelisted negations (`STOPWORDS - NEGATION_WHITELIST`).
-2. **Eliminated Data Leakage + `<OOV>` Tokenization:**
-   - Fit the Keras `Tokenizer(num_words=15000, oov_token="<OOV>")` strictly on `x_train` (never on `x_test` or `x_validation`).
-3. **Gaussian OOV Initialization in GloVe Matrix:**
-   - Initialized out-of-vocabulary words with small Gaussian noise $\mathcal{N}(0, 0.05)$ while keeping index `0` (`<PAD>`) as strict zeros so LSTM gates distinguish unknown words from padding.
-4. **Cost-Sensitive Learning (`class_weight='balanced'`):**
-   - Applied balanced class weights during `model.fit()` to counter dataset imbalance where `surprise` (~4%) and `love` (~8%) are underrepresented compared to `joy` and `sadness`.
-5. **Top-2 Softmax Probability Blending, Continuous Audio Feature Mapping & Therapy Mode:**
-   - Replaced blind `np.argmax` with **Top-2 Mixed Mood Blending** (detecting ambiguous states like *Sadness + Fear*).
-   - Mapped the 6-class softmax distribution into **Russell's 2D Valence-Energy Audio Space** (`Target Valence`, `Target Energy`, `Target Tempo`) with a psychological toggle between **Match My Mood (Iso-Principle)** and **Uplift / Soothe My Mood (Mood Regulation)**.
-
-
