@@ -189,11 +189,20 @@ def predict_emotion(text):
 
 
 
-CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID", "2fc21d89c44e49d5a926a48807bf0545")
-CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET", "4616a1ab31ad470fbdcecc7aba8e7ef1")
+CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
+CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
+
+if not CLIENT_ID or not CLIENT_SECRET:
+    try:
+        CLIENT_ID = st.secrets["SPOTIPY_CLIENT_ID"]
+        CLIENT_SECRET = st.secrets["SPOTIPY_CLIENT_SECRET"]
+    except Exception:
+        pass
 
 @st.cache_resource
 def get_spotify():
+    if not CLIENT_ID or not CLIENT_SECRET:
+        return None
     return spotipy.Spotify(auth_manager=SpotifyClientCredentials(
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET
@@ -220,6 +229,9 @@ uplift_music_map = {
 
 
 def get_songs(primary_emotion, secondary_emotion=None, mode="Match My Mood (Iso-Principle)"):
+    if not sp:
+        st.warning("Spotify credentials not configured. Please set SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET.")
+        return []
     try:
         active_map = emotion_music_map if "Match" in mode else uplift_music_map
         primary_query = active_map.get(primary_emotion, "trending songs")
